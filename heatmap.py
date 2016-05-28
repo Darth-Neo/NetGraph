@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-
 import sys
 import logging
 import math
@@ -46,7 +45,7 @@ class TrackLog:
 
     def _Parse(self, filename):
         for event, elem in ET.iterparse(filename, ('start', 'end')):
-            elem.tag = elem.tag[elem.tag.rfind('}') + 1:]   # remove namespace
+            elem.tag = elem.tag[elem.tag.rfind('}') + 1:]  # remove namespace
             if elem.tag == "trkseg":
                 if event == 'start':
                     self.segments.append(TrackLog.Trkseg())
@@ -78,7 +77,7 @@ class Projection():
     def Project(self, coords):
         raise NotImplementedError
 
-    def InverseProject(self, coords):   # Not all projections can support this.
+    def InverseProject(self, coords):  # Not all projections can support this.
         raise NotImplementedError
 
     def AutoSetScale(self, bounding_box_ll, padding):
@@ -120,7 +119,7 @@ class Projection():
                     bounding_box_xy.SizeX() * SCALE_FACTOR)
                 if options.height:
                     pixels_per_degree = min(pixels_per_degree, pixels_per_lat)
-        assert(pixels_per_degree > 0)
+        assert (pixels_per_degree > 0)
         self.SetScale(pixels_per_degree)
         logging.info('Scale: %f' % (111319.5 / pixels_per_degree))
 
@@ -156,7 +155,7 @@ class MercatorProjection(Projection):
         (lat, lon) = lat_lon
         x = int(lon * self.pixels_per_degree)
         y = -int(self.pixels_per_radian * math.log(
-            math.tan((math.pi/4 + math.pi/360 * lat))))
+            math.tan((math.pi / 4 + math.pi / 360 * lat))))
         return (x, y)
 
     def InverseProject(self, x_y):
@@ -166,6 +165,7 @@ class MercatorProjection(Projection):
                 math.exp(-y / self.pixels_per_radian)) - 90)
         lon = x / self.pixels_per_degree
         return (lat, lon)
+
 
 projections = {
     'equirectangular': EquirectangularProjection,
@@ -185,6 +185,7 @@ class BoundingBox():
     similar opportunity for magic with the desire to count fenceposts
     rather than distance, and here too we ignore the issue and let the
     caller deal with it as needed.'''
+
     def __init__(self, corners=None, shapes=None, string=None):
         if corners:
             self.FromCorners(corners)
@@ -305,10 +306,10 @@ class Matrix:
         return self.data.items()
 
     def Get(self, coord):
-        return self.data[coord]   # will throw KeyError for unset coord
+        return self.data[coord]  # will throw KeyError for unset coord
 
     def BoundingBox(self):
-        return(BoundingBox(iter=self.data.iterkeys()))
+        return (BoundingBox(iter=self.data.iterkeys()))
 
     def Finalized(self):
         return self
@@ -400,6 +401,7 @@ class Point:
     # distances, not heat values, and let the kernel cache the
     # distance to heat map, but this is substantially faster.
     heat_cache = {}
+
     @classmethod
     def InitializeHeatCache(cls, kernel):
         cache = {}
@@ -494,6 +496,7 @@ class LineSegment:
 
 class LinearKernel:
     '''Uses a linear falloff, essentially turning a point into a cone.'''
+
     def __init__(self, radius):
         self.radius = radius  # in pixels
         self.radius_float = float(radius)  # worthwhile time saver
@@ -640,7 +643,7 @@ class ImageSeriesMaker():
 
     def MaybeSaveImage(self, matrix):
         self.input_count += 1
-        x = self.input_count * self.frequency   # frequency <= 1
+        x = self.input_count * self.frequency  # frequency <= 1
         if x - int(x) < self.frequency:
             self.frame_count += 1
             logging.info(
@@ -789,7 +792,7 @@ def setup_options():
         '-P', '--projection', metavar='NAME', type='choice',
         choices=list(projections.keys()), default='mercator',
         help='choices: ' + ', '.join(projections.keys()) +
-        '; default: %default')
+             '; default: %default')
     optparser.add_option(
         '-e', '--extent', metavar='RANGE',
         help=(
@@ -848,8 +851,8 @@ def setup_options():
     optparser.add_option(
         '-G', '--gradient', metavar='FILE',
         help=(
-        'Take color gradient from this the first column of pixels in '
-        'this image.  Overrides -m and -M.'))
+            'Take color gradient from this the first column of pixels in '
+            'this image.  Overrides -m and -M.'))
     optparser.add_option(
         '-k', '--kernel',
         type='choice',
@@ -869,6 +872,7 @@ def setup_options():
         help='Zoom level for OSM; 0 (the default) means autozoom')
     optparser.add_option('-v', '--verbose', action='store_true')
     return optparser
+
 
 # Note to self: -m #0aa80ff00 -M #120ffffff is nice.
 
@@ -966,7 +970,7 @@ def main():
         bounding_box_ll = matrix.BoundingBox().Map(projection.InverseProject)
     else:
         bounding_box_ll = BoundingBox(shapes=shapes)
-        bounding_box_xy_padding += options.radius   # Make room for the spread
+        bounding_box_xy_padding += options.radius  # Make room for the spread
 
     background_image = None
     if options.background_image:
@@ -1035,6 +1039,7 @@ def main():
         pickle.dump(matrix, open(options.save, 'w'), 2)
 
     logging.info('end')
+
 
 if __name__ == '__main__':
     main()

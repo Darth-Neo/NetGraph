@@ -2,46 +2,22 @@
 #
 # __author__ = 'james.morris'
 import os
-import logging
-import logging.handlers
 
 from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import traceroute
 
-DEBUG = logging.DEBUG
-INFO = logging.INFO
-WARN = logging.WARN
-ERROR = logging.ERROR
+from Logger import *
+logger = setupLogging(__name__)
+logger.setLevel(DEBUG)
 
-def setupLogging(name):
-    #
-    # Logging setup
-    #
-    logger = logging.getLogger(name)
-    logFile = './log.txt'
 
-    # Note: Levels - DEBUG INFO WARN ERROR CRITICAL
-    logger.setLevel(logging.INFO)
-
-    logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s] [%(filename)s:%(lineno)s ] %(message)s")
-
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    logger.addHandler(consoleHandler)
-
-    fileHandler = logging.handlers.RotatingFileHandler(logFile, maxBytes=10485760, backupCount=5)
-    fileHandler.setFormatter(logFormatter)
-    logger.addHandler(fileHandler)
-
-    return logger
-
-if __name__ == "__main__":
+if __name__ == u"__main__":
     logger = setupLogging(__name__)
     logger.setLevel(INFO)
 
-    logger.info("IP : %s" % IP)
-    logger.info("%sconf.route : %s" % (os.linesep, conf.route))
+    logger.info(u"IP : %s" % IP)
+    logger.info(u"%sconf.route : %s" % (os.linesep, conf.route))
 
     n = 0
     r = None
